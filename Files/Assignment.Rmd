@@ -1,0 +1,169 @@
+---
+title: "R assignment"
+author: "Akhil"
+date: "10/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+
+# Read a txt file, named "fang_et_al_genotypes.txt"
+install.packages("tidyverse")
+install.packages("dplyr")
+library(tidyr)
+library(dplyr)
+fang<- read.delim("fang_et_al_genotypes.txt")
+
+nrow(fang)
+ncol(fang)
+
+library(MODIS)
+file.size(fang, extra_cols = FALSE)
+dim(fang)
+length(count.fields(fang))
+length(readLines(fang))
+fileSize(fang, units = "B")
+install.packages("MODIS")
+fileSize(fang, units = "B")
+path.expand("fang_et_al_genotypes.txt")
+file.info("fang_et_al_genotypes.txt", extra_cols = TRUE)
+file.size("fang_et_al_genotypes.txt")
+file.size("fang_et_al_genotypes.txt", units = "GB")
+file.mode("fang_et_al_genotypes.txt")
+file.mtime("fang_et_al_genotypes.txt")
+
+
+# Read a txt file, named "snp_position.txt"
+snp<- read.delim("snp_position.txt")
+
+length(readLines("snp_position.txt"))
+ncol(snp)
+file.size("snp_position.txt", units = "B")
+file.mode("snp_position.txt")
+file.mtime("snp_position.txt")
+
+Snp1 = select(snp, 1,-2,3,4)
+Maize_ <- filter(fang, Group %in% c("ZMMLR", "ZMMMR", "ZMMIL"))
+
+Maize_ <- filter(fang, Group %in% c("ZMMLR", "ZMMMR", "ZMMIL"))
+Teosinte_ <- filter(fang, Group %in% c("ZMPBA", "ZMPIL", "ZMPJA"))
+
+View(Maize)
+
+col_Maize=select(Maize_, 1,-2,-3,4:986)
+col_Teosinte=select(Teosinte_, 1,-2,-3,4:986)
+View(col_Teosinte)
+colnames(col_Teosinte) <- c()
+(col_Teosinte)
+col_Maize=select(Maize_, 1,-2,-3,4:986)
+
+colnames(col_Maize) <- c()
+
+transposed_maize <- t(col_Maize)
+
+transposed_Teosinte <- t(col_Teosinte)
+(transposed_Teosinte)
+
+
+Join_Maize <- merge(Snp1, transposed_maize, by=NULL, all.x=TRUE)
+Join_Teosinte <- merge(Snp1, transposed_Teosinte, by=NULL, all.x=TRUE)
+
+#the large  data is slowing down R. Hence taking into account only the needed first 15columns(SNP, position, position) of the ne joined file#
+
+Join_Maize = select(Join_Maize, 1:15)
+Join_Teosinte = select(Join_Teosinte, 1:15)
+View(Join_Teosinte)
+
+
+#replace "?/?" to "?"
+Join_Maize <- data.frame(lapply(Join_Maize, as.character), stringsAsFactors=FALSE)
+Join_Maize <- data.frame(sapply(Join_Maize,function(x) {x <- gsub("?/?","?",x,fixed=TRUE)}))
+Join_Teosinte <- data.frame(lapply(Join_Teosinte, as.character), stringsAsFactors=FALSE)
+Join_Teosinte<- data.frame(sapply(Join_Teosinte,function(x) {x <- gsub("?/?","?",x,fixed=TRUE)}))
+
+for (i in 1:10) {
+  maize <- filter(maize_fang_et_al_genotypes, Chromosome == i)
+  maize <- arrange(maize, Position)
+  outpath <- "C:/Users/akhil/Desktop/R/R Assignment/Files/"
+  nam <- sapply(
+    names(maize),function(x){
+      paste("maize", i, ".csv", sep='')
+    })
+  out_filePath <- sapply(nam, function(x){
+    paste(outpath, x, sep='/')})
+  write.csv(maize, file=out_filePath[i]) # for maize increasing data
+
+#replace "?" to "-"
+Join_Maize2 <- data.frame(lapply(Join_Maize, as.character), stringsAsFactors=FALSE)
+Join_Maize2 <- data.frame(sapply(Join_Maize2,function(x) {x <- gsub("?","-",x,fixed=TRUE)}))
+Join_Teosinte2 <- data.frame(lapply(Join_Teosinte, as.character), stringsAsFactors=FALSE)
+Join_Teosinte2<- data.frame(sapply(Join_Teosinte2,function(x) {x <- gsub("?","-",x,fixed=TRUE)}))
+
+
+#For sorting in decreasing order of position
+Join_Teosinte_decposition <- arrange(Join_Teosinte2, desc(Position))
+#For selecting first 10 files of position sorted
+Join_Teosinte_decposition <- Join_Teosinte_decposition[1:10,]
+View(Join_Teosinte_decposition)
+write.csv(Join_Teosinte_decposition,'Join_Teosinte_decposition')
+
+#For sorting in decreasing order of position
+Join_Maize2_decposition <- arrange(Join_Maize2, desc(Position))
+#For selecting first 10 files of position sorted
+Join_Maize2_decposition <- Join_Maize2_decposition[1:10,]
+View(Join_Maize2_decposition)
+write.csv(Join_Maize2_decposition,'Join_Maize2_decposition')
+#For sorting in increasing order of position
+Join_Maize_incposition <- arrange(Join_Maize, Position)
+#For selecting first 10 files of position sorted
+Join_Maize_incposition <- Join_Maize_incposition[1:10,]
+View(Join_Maize_incposition)
+write.csv(Join_Maize_incposition,'Join_Maize_incposition')
+
+#For sorting in increasing order of position
+Join_Teosinte_incposition <- arrange(Join_Teosinte, Position)
+#For selecting first 10 files of position sorted
+Join_Teosinte_incposition <- Join_Teosinte_incposition[1:10,]
+View(Join_Teosinte_incposition)
+write.csv(Join_Teosinte_incposition,'Join_Teosinte_incposition')
+
+
+
+
+#COde not working to push and save as 10 seprate files. hence moving on.
+
+install.packages("tidyverse")
+library(tidyverse)
+ install.packages("reshape2")
+library(reshape2)
+
+ ggplot(data = Join_Maize, mapping = (aes(x=Chromosome, y=SNP_ID))) + geom_point()
+# exported as Maize plot by using the export option in Plots pane
+
+ ggplot(data = Join_Teosinte, mapping = (aes(x=Chromosome, y=SNP_ID))) + geom_point()
+
+
+ # For distribution
+ 
+ ggplot(data = Join_Maize) + geom_density(mapping = aes(x=SNP_ID), fill="blue")
+ 
+ ggplot(data = Join_Teosinte) + geom_density(mapping = aes(x=SNP_ID), fill="blue")
+           
+ 
+ #My Visulaization
+ 
+ plot(x=Join_Maize$Chromosome)gc() 
+ 
+ plot(x=Join_Teosinte$Chromosome) 
+
+ 
